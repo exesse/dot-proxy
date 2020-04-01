@@ -1,0 +1,8 @@
+.idea/
+venv/
+etc.py
+kdig.py
+resolver.py
+simple-client.py
+tmp2.py
+tmp.py
