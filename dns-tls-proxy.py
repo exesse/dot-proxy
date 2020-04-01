@@ -1,6 +1,7 @@
 from socketserver import BaseRequestHandler, TCPServer, UDPServer
 import socket
 import ssl
+import threading
 
 
 class DNSoverTCP(BaseRequestHandler):
@@ -26,7 +27,7 @@ class DNSoverUDP(BaseRequestHandler):
 
 def tls_wrapper(packet, hostname, port=853):
     context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
-    with socket.create_connection((hostname, port), timeout=5) as sock:
+    with socket.create_connection((hostname, port), timeout=10) as sock:
         with context.wrap_socket(sock, server_hostname=hostname) as ssock:
             ssock.send(packet)
             result = ssock.recv(socket_size)
@@ -43,5 +44,13 @@ if __name__ == '__main__':
     nameserver = '8.8.8.8'
     socket_size = 1024
     proxy_port = 5005
-    serv = UDPServer(('', proxy_port), DNSoverUDP)
-    serv.serve_forever()
+    tcp_proxy = TCPServer(('', proxy_port), DNSoverTCP)
+    udp_proxy = UDPServer(('', proxy_port), DNSoverUDP)
+
+    tcp_thread = threading.Thread(target=tcp_proxy.serve_forever)
+    udp_thread = threading.Thread(target=udp_proxy.serve_forever)
+
+    tcp_thread.start()
+    print('DNS Proxy over TCP started and listening on port %s' % proxy_port)
+    udp_thread.start()
+    print('DNS Proxy over UDP started and listening on port %s' % proxy_port)
