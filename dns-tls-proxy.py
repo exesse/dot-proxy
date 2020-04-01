@@ -2,6 +2,7 @@ from socketserver import BaseRequestHandler, TCPServer, UDPServer
 import socket
 import ssl
 import threading
+import multiprocessing
 
 
 class DNSoverTCP(BaseRequestHandler):
@@ -47,8 +48,8 @@ if __name__ == '__main__':
     tcp_proxy = TCPServer(('', proxy_port), DNSoverTCP)
     udp_proxy = UDPServer(('', proxy_port), DNSoverUDP)
 
-    tcp_thread = threading.Thread(target=tcp_proxy.serve_forever)
-    udp_thread = threading.Thread(target=udp_proxy.serve_forever)
+    tcp_thread = multiprocessing.Process(target=tcp_proxy.serve_forever)
+    udp_thread = multiprocessing.Process(target=udp_proxy.serve_forever)
 
     tcp_thread.start()
     print('DNS Proxy over TCP started and listening on port %s' % proxy_port)
