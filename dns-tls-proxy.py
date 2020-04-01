@@ -1,4 +1,4 @@
-from socketserver import BaseRequestHandler, TCPServer, UDPServer
+from socketserver import BaseRequestHandler, ThreadingTCPServer, ThreadingUDPServer
 import socket
 import ssl
 import threading
@@ -29,9 +29,9 @@ class DNSoverUDP(BaseRequestHandler):
 def tls_wrapper(packet, hostname, port=853):
     context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
     with socket.create_connection((hostname, port), timeout=10) as sock:
-        with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-            ssock.send(packet)
-            result = ssock.recv(socket_size)
+        with context.wrap_socket(sock, server_hostname=hostname) as tlssock:
+            tlssock.send(packet)
+            result = tlssock.recv(socket_size)
             return result
 
 
@@ -45,8 +45,8 @@ if __name__ == '__main__':
     nameserver = '8.8.8.8'
     socket_size = 1024
     proxy_port = 5005
-    tcp_proxy = TCPServer(('', proxy_port), DNSoverTCP)
-    udp_proxy = UDPServer(('', proxy_port), DNSoverUDP)
+    tcp_proxy = ThreadingTCPServer(('', proxy_port), DNSoverTCP)
+    udp_proxy = ThreadingUDPServer(('', proxy_port), DNSoverUDP)
 
     tcp_thread = multiprocessing.Process(target=tcp_proxy.serve_forever)
     udp_thread = multiprocessing.Process(target=udp_proxy.serve_forever)
