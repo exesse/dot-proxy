@@ -2,12 +2,12 @@
 Python implementation for DNS over TLS proxy server.
 
 Listens for both TCP and UDP packet on native 53 port. Converts plain UDP packets to TCP by prefixing message with a 
-two bytes length field which the incoming UDP message have[[1]](#1).
+two bytes length field which the incoming UDP message have [[1]](#1).
 
 By default establishes SSL connection with CloudFlare DNS (1.1.1.1) over 853 port. Python function 
 'create_default_context' from build-in ssl library used to establish connection with nameserver. 
 The function loads system's trusted CA certificates, does hostname checking and sets reasonable secure 
-protocol and cipher settings[[2]](#2).
+protocol and cipher settings [[2]](#2).
 
 Default buffer size is set to 1024, which should be sufficient for most DNS queries.
 Socket has 5 seconds timeout which corresponds with default timeout of dns tools like 'dig' or 'kdig'. 
@@ -74,7 +74,7 @@ n26.com.            	155	IN	SOA	ns-1688.awsdns-19.co.uk. awsdns-hostmaster.amazo
 * Still prone to spoofing in between client and proxy communications.
 * Trusted CA should be explicitly specified.
 * BIND 9 does not support TLS by default. This means if the first nameserver does not have record we are querying for 
-it may simply fallback to plian tcp in recursion to another nameserver[[3]](#3). 
+it may simply fallback to plian tcp in recursion to another nameserver [[3]](#3). 
 * Could be combined with DNS over HTTPS(DoH) to compromise local network policies or restrictions.
 
 
@@ -97,7 +97,7 @@ respectively.
 
 **Notes**
 
-\*Popular load balancer NGINX also could be configured to proxy DNS over TLS queries[[4]](#4).
+\*Popular load balancer NGINX also could be configured to proxy DNS over TLS queries [[4]](#4).
 
 ** Will decently have negative impact on performance. And some sort of quorum needed to identify which of the record is 
 correct in case of mismatch.  
