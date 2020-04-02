@@ -12,7 +12,7 @@ protocol and cipher settings [[2]](#2).
 Default buffer size is set to 1024, which should be sufficient for most DNS queries.
 Socket has 5 seconds timeout which corresponds with default timeout of dns tools like 'dig' or 'kdig'. 
 
-###### HOW TO RUN
+#### HOW TO RUN
 
 **Option 1.**
 
@@ -30,7 +30,7 @@ Run source code directly.
 is not in use and firewall software allows incoming connections to the mentioned port. To start proxy on custom local 
 port by adjusting 'proxy_port' variable in 'dot-proxy.py' file.   
 
-###### HOW TO TEST
+#### HOW TO TEST
 
 Test example with 'kdig' tool:
 
@@ -66,9 +66,9 @@ n26.com.            	155	IN	SOA	ns-1688.awsdns-19.co.uk. awsdns-hostmaster.amazo
 ;; From 172.17.0.2@53(UDP) in 175.4 ms
 ````
 
-###### QUESTIONS
+#### QUESTIONS
 
-**Security concerns**
+**Security concerns:**
 
 * Prone to denial of service attacks. Could be resolved by specifying maximum pool size of threads for TCP/UDP servers.
 * Still prone to spoofing in between client and proxy communications.
@@ -78,14 +78,14 @@ it may simply fallback to plian tcp in recursion to another nameserver [[3]](#3)
 * Could be combined with DNS over HTTPS(DoH) to compromise local network policies or restrictions.
 
 
-**Microservices integration**
+**Microservices integration:**
 * Comes packed as docker container and ready to be deployed
 * Could be combined with load balancer in docker-compose file to perform some sort of round-robin.* 
 * For deployment in k8s the proxy should be explicitly specified as nameserver or kube-dns(CoreDNS) should be configured 
 respectively.   
 
 
-**Improvements**
+**Improvements:**
 * To speedup queries caching should be used.
 * Temporary block for the client that sends too much queries at a time should be implemented.
 * Correct thread termination on system signals should be implemented.
