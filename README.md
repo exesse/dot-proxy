@@ -1,16 +1,16 @@
 # dot-proxy
-Python implementation for DNS over TLS proxy server.
+Python implementation of simple DNS over TLS proxy server.
 
-Listens for both TCP and UDP packet on native 53 port. Converts plain UDP packets to TCP by prefixing message with a 
+Listens for both TCP and UDP messages on native 53 port. Converts plain UDP packets to TCP by prefixing message with a 
 two bytes length field which the incoming UDP message have [[1]](#1).
 
 By default establishes SSL connection with CloudFlare DNS (1.1.1.1) over 853 port. Python function 
-'create_default_context' from build-in ssl library used to establish connection with nameserver. 
+'create_default_context' from build-in ssl library was used to establish connection with nameserver. 
 The function loads system's trusted CA certificates, does hostname checking and sets reasonable secure 
 protocol and cipher settings [[2]](#2).
 
-Default buffer size is set to 1024, which should be sufficient for most DNS queries.
-Socket has 5 seconds timeout which corresponds with default timeout of dns tools like 'dig' or 'kdig'. 
+Default buffer size is set to 1024, which is sufficient for most DNS queries.
+Socket has 5 seconds timeout - that corresponds with default timeout of dns tools like 'dig' or 'kdig'. 
 
 #### HOW TO RUN
 
@@ -26,16 +26,15 @@ Run source code directly.
 
 `sudo ./dot-proxy.py`
 
-*by default non-root users are not allowed to use ports below 1024 on *nix systems. Please also make sure that port 53 
-is not in use and firewall software allows incoming connections to the mentioned port. To start proxy on custom local 
-port by adjusting 'proxy_port' variable in 'dot-proxy.py' file.   
+*by default non-root users are not allowed to use ports below 1024 on *nix systems. Please make sure that port 53 
+is not in use and firewall software allows incoming connections to the mentioned port. To start proxy on custom 
+port simply adjust 'proxy_port' variable in 'dot-proxy.py' file.   
 
 #### HOW TO TEST
 
-Test example with 'kdig' tool:
+'Dig', 'kdig', 'drill', 'wireshark' could be used for testing. Here is TCP test example performed with 'kdig' tool.
 
 ````bash
-# TCP Version
 kdig @172.17.0.2 n26.com A +tcp
 ;; ->>HEADER<<- opcode: QUERY; status: NOERROR; id: 6574
 ;; Flags: qr rd ra; QUERY: 1; ANSWER: 1; AUTHORITY: 0; ADDITIONAL: 0
@@ -49,7 +48,10 @@ n26.com.            	44	IN	A	128.65.211.162
 ;; Received 48 B
 ;; Time 2020-04-02 16:40:02 CEST
 ;; From 172.17.0.2@53(TCP) in 152.7 ms
+````
 
+And here is another example again with 'kdig', but this time over UDP.  
+```bash
 # UDP Version 
 kdig @172.17.0.2 n26.com AAAA
 ;; ->>HEADER<<- opcode: QUERY; status: NOERROR; id: 58993
@@ -74,33 +76,32 @@ n26.com.            	155	IN	SOA	ns-1688.awsdns-19.co.uk. awsdns-hostmaster.amazo
 * Still prone to spoofing in between client and proxy communications.
 * Trusted CA should be explicitly specified.
 * BIND 9 does not support TLS by default. This means if the first nameserver does not have record we are querying for 
-it may simply fallback to plian tcp in recursion to another nameserver [[3]](#3). 
-* Could be combined with DNS over HTTPS(DoH) to compromise local network policies or restrictions.
+it may simply fallback to plain tcp in recursion to another nameserver [[3]](#3). 
 
 
 **Microservices integration:**
-* Comes packed as docker container and ready to be deployed
-* Could be combined with load balancer in docker-compose file to perform some sort of round-robin.* 
-* For deployment in k8s the proxy should be explicitly specified as nameserver or kube-dns(CoreDNS) should be configured 
+* Comes packed as docker container and ready to be deployed.
+* Several instances could be combined with front facing load balancer in docker-compose file to upstream queries in some
+ sort of round-robin.* 
+* For deployment in k8s the proxy should be specified as nameserver or kube-dns(CoreDNS) should be configured 
 respectively.   
 
 
 **Improvements:**
-* To speedup queries caching should be used.
-* Temporary block for the client that sends too much queries at a time should be implemented.
-* Correct thread termination on system signals should be implemented.
-* Error handlers should be added. 
+* To decrease latency of clients queries caching on proxy side should be used.
+* Temporary block for client that sends too much queries at a time should be implemented.
+* Correct thread termination on system signals should be implemented. As well as error handlers should be added. 
 * Fallback on other public\private DNS over TLS(DoT) server should be implemented.
 * Extra layer of security which compares query's result with other DoT may be added.**
-* Lame Duck State could be added to inform about overload and explicitly requests client to send request to other server.
+* Lame Duck State could be added to inform about overload and explicitly requests clients to send request to other server.
 * Monitoring and\or alerting features could be added.
 
 **Notes**
 
 \*Popular load balancer NGINX also could be configured to proxy DNS over TLS queries [[4]](#4).
 
-** Will decently have negative impact on performance. And some sort of quorum needed to identify which of the record is 
-correct in case of mismatch.  
+** Will definitely have negative impact on performance. Also some sort of quorum must be implemented in this scenario 
+to identify correct record in case of mismatch between nameservers.  
 
 **Links**
 
