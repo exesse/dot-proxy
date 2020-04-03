@@ -4,7 +4,7 @@ Python implementation of simple DNS over TLS proxy server.
 Listens for both TCP and UDP messages on native 53 port. Converts plain UDP packets to TCP by prefixing message with a 
 two bytes length field which the incoming UDP message have [[1]](#1).
 
-By default establishes SSL connection with CloudFlare DNS (1.1.1.1) over 853 port. Python function 
+By default establishes SSL connection with Cloudflare DNS (1.1.1.1) over 853 port. Python function 
 'create_default_context' from build-in **ssl** library was used to establish connection with nameserver. 
 The function loads system's trusted CA certificates, does hostname checking and sets reasonable secure 
 protocol and cipher settings [[2]](#2).
