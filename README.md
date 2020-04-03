@@ -5,12 +5,12 @@ Listens for both TCP and UDP messages on native 53 port. Converts plain UDP pack
 two bytes length field which the incoming UDP message have [[1]](#1).
 
 By default establishes SSL connection with CloudFlare DNS (1.1.1.1) over 853 port. Python function 
-'create_default_context' from build-in ssl library was used to establish connection with nameserver. 
+'create_default_context' from build-in **ssl** library was used to establish connection with nameserver. 
 The function loads system's trusted CA certificates, does hostname checking and sets reasonable secure 
 protocol and cipher settings [[2]](#2).
 
-Default buffer size is set to 1024, which is sufficient for most DNS queries.
-Socket has 5 seconds timeout - that corresponds with default timeout of dns tools like 'dig' or 'kdig'. 
+Default buffer size is set to 1024, which is sufficient for most DNS queries. Socket is set to 5 seconds timeout which 
+corresponds with the default timeout of dns tools like 'dig' or 'kdig'. 
 
 #### HOW TO RUN
 
@@ -32,7 +32,7 @@ port simply adjust 'proxy_port' variable in 'dot-proxy.py' file.
 
 #### HOW TO TEST
 
-'Dig', 'kdig', 'drill', 'wireshark' could be used for testing. Here is TCP test example performed with 'kdig' tool.
+'Dig', 'kdig', 'drill', 'wireshark' could be used for testing. Here is a TCP test example performed with 'kdig' tool.
 
 ````bash
 kdig @172.17.0.2 n26.com A +tcp
@@ -52,7 +52,6 @@ n26.com.            	44	IN	A	128.65.211.162
 
 And here is another example again with 'kdig', but this time over UDP.  
 ```bash
-# UDP Version 
 kdig @172.17.0.2 n26.com AAAA
 ;; ->>HEADER<<- opcode: QUERY; status: NOERROR; id: 58993
 ;; Flags: qr rd ra; QUERY: 1; ANSWER: 0; AUTHORITY: 1; ADDITIONAL: 0
@@ -75,23 +74,23 @@ n26.com.            	155	IN	SOA	ns-1688.awsdns-19.co.uk. awsdns-hostmaster.amazo
 * Prone to denial of service attacks. Could be resolved by specifying maximum pool size of threads for TCP/UDP servers.
 * Still prone to spoofing in between client and proxy communications.
 * Trusted CA should be explicitly specified.
-* BIND 9 does not support TLS by default. This means if the first nameserver does not have record we are querying for 
-it may simply fallback to plain tcp in recursion to another nameserver [[3]](#3). 
+* BIND 9 does not support TLS by default. If the first nameserver does not have requested record it may simply fallback 
+to plain tcp in recursion to another nameserver [[3]](#3). 
 
 
 **Microservices integration:**
 * Comes packed as docker container and ready to be deployed.
-* Several instances could be combined with front facing load balancer in docker-compose file to upstream queries in some
+* Several instances could be combined with front-facing load balancer in docker-compose file to upstream queries in some
  sort of round-robin.* 
 * For deployment in k8s the proxy should be specified as nameserver or kube-dns(CoreDNS) should be configured 
 respectively.   
 
 
 **Improvements:**
-* To decrease latency of clients queries caching on proxy side should be used.
+* To decrease latency for clients queries caching on proxy side should be used.
 * Temporary block for client that sends too much queries at a time should be implemented.
 * Correct thread termination on system signals should be implemented. As well as error handlers should be added. 
-* Fallback on other public\private DNS over TLS(DoT) server should be implemented.
+* Fallback on other public\private DNS over TLS(DoT) server could be implemented.
 * Extra layer of security which compares query's result with other DoT may be added.**
 * Lame Duck State could be added to inform about overload and explicitly requests clients to send request to other server.
 * Monitoring and\or alerting features could be added.
