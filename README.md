@@ -67,41 +67,6 @@ n26.com.            	155	IN	SOA	ns-1688.awsdns-19.co.uk. awsdns-hostmaster.amazo
 ;; From 172.17.0.2@53(UDP) in 175.4 ms
 ````
 
-#### QUESTIONS
-
-**Security concerns:**
-
-* Prone to denial of service attacks. Could be resolved by specifying maximum pool size of threads for TCP/UDP servers.
-* Still prone to spoofing in between client and proxy communications.
-* Trusted CA should be explicitly specified.
-* BIND 9 does not support TLS by default. If the first nameserver does not have requested record it may simply fallback 
-to plain tcp in recursion to another nameserver [[3]](#3). 
-
-
-**Microservices integration:**
-* Comes packed as docker container and ready to be deployed.
-* Several instances could be combined with front-facing load balancer in docker-compose file to upstream queries in some
- sort of round-robin.* 
-* For deployment in k8s the proxy should be specified as nameserver or kube-dns(CoreDNS) should be configured 
-respectively.   
-
-
-**Improvements:**
-* To decrease latency for clients queries caching on proxy side should be used.
-* Temporary block for client that sends too much queries at a time should be implemented.
-* Correct thread termination on system signals should be implemented. As well as error handlers should be added. 
-* Fallback on other public\private DNS over TLS(DoT) server could be implemented.
-* Extra layer of security which compares query's result with other DoT may be added.**
-* Lame Duck State could be added to inform about overload and explicitly requests clients to send request to other server.
-* Monitoring and\or alerting features could be added.
-
-**Notes**
-
-\*Popular load balancer NGINX also could be configured to proxy DNS over TLS queries [[4]](#4).
-
-** Will definitely have negative impact on performance. Also some sort of quorum must be implemented in this scenario 
-to identify correct record in case of mismatch between nameservers.  
-
 **Links**
 
 <a id="1">[1]</a> 
@@ -113,13 +78,3 @@ https://tools.ietf.org/html/rfc1035
 ssl — TLS/SSL wrapper for socket objects. 
 Link: 
 https://docs.python.org/3/library/ssl.html
-
-<a id="1">[3]</a>
-DNS over TLS - BIND 9.
-Link: 
-https://kb.isc.org/docs/aa-01386
-
-<a id="1">[4]</a>
-Using NGINX as a DoT or DoH Gateway.
-Link:
-https://www.nginx.com/blog/using-nginx-as-dot-doh-gateway

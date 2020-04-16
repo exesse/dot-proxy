@@ -64,7 +64,7 @@ def udp_to_tcp(packet):
 if __name__ == '__main__':
     nameserver = '1.1.1.1'
     proxy_addr = ''
-    proxy_port = 53
+    proxy_port = 5300
     buffer_size = 1024
 
     ThreadingTCPServer.allow_reuse_address = True
