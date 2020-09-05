@@ -13,18 +13,27 @@ Default buffer size is set to 1024, which is sufficient for most DNS queries. So
 corresponds with the default timeout of dns tools like 'dig' or 'kdig'. 
 
 #### HOW TO RUN
+* Option 1:
 
-**Option 1.**
+Pull docker container from github:
 
-Pull docker container from dockerhub.
+`docker pull docker.pkg.github.com/exesse/dot-proxy/dot_proxy:1.0.0`
 
-`docker run {-d -p <localport>:53 -p <localport>:53/udp --name <container_name>} exesse/dot-proxy`
+Start pulled container:
 
-**Option 2.**
+`docker run -d --name dot_proxy docker.pkg.github.com/exesse/dot-proxy/dot_proxy:1.0.0`
 
-Run source code directly.
+* Option 2:
 
-`sudo ./dot-proxy.py`
+Make source code executable:
+
+'chmod +x dot_proxy.py'
+
+Set 'PROXY_PORT' variable to some unused port like `5300`
+
+Start executable app by running the following:  
+
+`./dot-proxy.py`
 
 *by default non-root users are not allowed to use ports below 1024 on *nix systems. Please make sure that port 53 
 is not in use and firewall software allows incoming connections to the mentioned port. To start proxy on custom 
@@ -35,36 +44,38 @@ port simply adjust 'proxy_port' variable in 'dot-proxy.py' file.
 'Dig', 'kdig', 'drill', 'wireshark' could be used for testing. Here is a TCP test example performed with 'kdig' tool.
 
 ````bash
-kdig @172.17.0.2 n26.com A +tcp
-;; ->>HEADER<<- opcode: QUERY; status: NOERROR; id: 6574
+kdig @172.17.0.2 google.com A +tcp
+
+;; ->>HEADER<<- opcode: QUERY; status: NOERROR; id: 8769
 ;; Flags: qr rd ra; QUERY: 1; ANSWER: 1; AUTHORITY: 0; ADDITIONAL: 0
 
 ;; QUESTION SECTION:
-;; n26.com.            		IN	A
+;; google.com.                  IN      A
 
 ;; ANSWER SECTION:
-n26.com.            	44	IN	A	128.65.211.162
+google.com.             75      IN      A       172.217.19.78
 
-;; Received 48 B
-;; Time 2020-04-02 16:40:02 CEST
-;; From 172.17.0.2@53(TCP) in 152.7 ms
+;; Received 54 B
+;; Time 2020-09-05 19:42:43 CEST
+;; From 172.17.0.2@53(TCP) in 127.2 ms
 ````
 
 And here is another example again with 'kdig', but this time over UDP.  
 ```bash
-kdig @172.17.0.2 n26.com AAAA
-;; ->>HEADER<<- opcode: QUERY; status: NOERROR; id: 58993
-;; Flags: qr rd ra; QUERY: 1; ANSWER: 0; AUTHORITY: 1; ADDITIONAL: 0
+kdig @172.17.0.2 google.com AAAA
+
+;; ->>HEADER<<- opcode: QUERY; status: NOERROR; id: 51129
+;; Flags: qr rd ra; QUERY: 1; ANSWER: 1; AUTHORITY: 0; ADDITIONAL: 0
 
 ;; QUESTION SECTION:
-;; n26.com.            		IN	AAAA
+;; google.com.                  IN      AAAA
 
-;; AUTHORITY SECTION:
-n26.com.            	155	IN	SOA	ns-1688.awsdns-19.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400
+;; ANSWER SECTION:
+google.com.             187     IN      AAAA    2a00:1450:4005:80b::200e
 
-;; Received 116 B
-;; Time 2020-04-02 16:34:59 CEST
-;; From 172.17.0.2@53(UDP) in 175.4 ms
+;; Received 66 B
+;; Time 2020-09-05 19:43:05 CEST
+;; From 172.17.0.2@53(UDP) in 141.0 ms
 ````
 
 **Links**
