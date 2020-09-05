@@ -12,7 +12,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 NAMESERVER = '1.1.1.1'
 PROXY_ADDR = ''
-PROXY_PORT = 5300
+PROXY_PORT = 53
 BUFFER_SIZE = 1024
 
 
